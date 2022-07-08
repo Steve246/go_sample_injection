@@ -5,10 +5,16 @@ import (
 	"os"
 
 	"github.com/jmoiron/sqlx"
+	_ "github.com/lib/pq"
 )
 
 type Config struct {
 	Db *sqlx.DB
+}
+
+type ApiConfig struct {
+	ApiHost string 
+	ApiPort string 
 }
 
 type dbConfig struct {
@@ -20,14 +26,17 @@ type dbConfig struct {
 	dbDriver string 
 }
 
+// DB_DRIVER=postgres DB_HOST=localhost DB_PORT=5432 DB_USER=postgres DB_PASSWORD= DB_NAME=postgres API_HOST=localhost API_PORT=8888 go run .
+
+
 func (c *Config) initDb() {
 	var dbConfig = dbConfig{}
 	dbConfig.dbHost = os.Getenv("DB_HOST")
 	dbConfig.dbPort = os.Getenv("DB_PORT")
 	dbConfig.dbUser = os.Getenv("DB_USER")
 	dbConfig.dbPassword = os.Getenv("DB_PASSWORD")
-	dbConfig.dbName = os.Getenv("DB_NAME")
-	dbConfig.dbDriver = os.Getenv("DB_DRIVER")
+	dbConfig.dbName = os.Getenv("DB_NAME") //db_sql_injection
+	dbConfig.dbDriver = os.Getenv("DB_DRIVER") //postgres
 
 
 
@@ -49,6 +58,12 @@ if err != nil {
 c.Db = db 
 
 }
+
+func (c *Config) DbConn() *sqlx.DB {
+	return c.Db
+}
+
+
 
 
 func NewConfig() Config {
